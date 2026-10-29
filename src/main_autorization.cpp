@@ -4,6 +4,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include "autorization_ui/autorization_app.h"
+#include "cheat/proc_mem.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -32,6 +33,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             SetProcessDPIAware();
         }
     }
+
+    cheat::EnableDebugPrivilege();
 
     // Register custom window class
     WNDCLASSEXW wc = { 
@@ -102,6 +105,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             if (msg.message == WM_QUIT) done = true;
+            if (msg.message == WM_APP + 1) app.SwitchScreenPublic(hwnd, 1);
         }
         if (done) break;
 

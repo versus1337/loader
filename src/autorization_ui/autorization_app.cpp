@@ -1,5 +1,6 @@
 #include "autorization_app.h"
 #include "autorization_widgets.h"
+#include "../cheat/cheat_core.h"
 #include "imgui_internal.h"
 #include <algorithm>
 #include <cmath>
@@ -100,6 +101,7 @@ AutorizationApp::AutorizationApp()
 }
 
 AutorizationApp::~AutorizationApp() {
+    cheat::Engine::Get().Shutdown();
     if (m_pTexCatboy) { m_pTexCatboy->Release(); m_pTexCatboy = nullptr; }
     if (m_pTexChibi)  { m_pTexChibi->Release();  m_pTexChibi = nullptr; }
     if (m_pTexEnma)   { m_pTexEnma->Release();   m_pTexEnma = nullptr; }
@@ -190,9 +192,12 @@ void AutorizationApp::SwitchScreen(HWND hwnd, int newScreen) {
     if (newScreen == 0) {
         m_targetWinWidth = 680;
         m_targetWinHeight = 460;
-    } else {
+    } else if (newScreen == 1) {
         m_targetWinWidth = 720;
         m_targetWinHeight = 490;
+    } else {
+        m_targetWinWidth = 900;
+        m_targetWinHeight = 560;
     }
     m_currentWinWidth  = m_targetWinWidth;
     m_currentWinHeight = m_targetWinHeight;
@@ -629,9 +634,8 @@ void AutorizationApp::RenderSubscriptionScreen(HWND hwnd, ImDrawList* draw, cons
 
         if (AutoWidgets::PlayButton(playBtnId.c_str(), playPos, playSize)) {
             m_selectedCard = i;
-            m_isLaunching = true;
-            m_launchProgress = 0.0f;
-            m_statusMsg = std::string("Launching ") + cardName + "...";
+            m_cheat.Launch(hwnd);
+            SwitchScreen(hwnd, 2);
         }
     }
 
@@ -701,8 +705,10 @@ void AutorizationApp::Render(HWND hwnd) {
     // Render corresponding screen based on state
     if (m_currentScreen == 0) {
         RenderLoginScreen(hwnd, draw, winPos, winSize);
-    } else {
+    } else if (m_currentScreen == 1) {
         RenderSubscriptionScreen(hwnd, draw, winPos, winSize);
+    } else {
+        m_cheat.Render(hwnd, m_fontRegular, m_fontSmall, m_fontSemiBold, m_fontHeader);
     }
 
     ImGui::End();
