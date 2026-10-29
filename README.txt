@@ -1,1 +1,1 @@
-alın size loader gui discord.gg/ryko
+
